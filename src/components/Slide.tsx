@@ -33,8 +33,10 @@ const Slide: React.FC<{
         if (!rect) {
             return;
         }
-        const dropX = e.clientX - rect.left - dragOffset.current.left;
-        const dropY = e.clientY - rect.top - dragOffset.current.top;
+        console.log(`${e.clientX} - ${rect.left} - ${dragOffset.current.left} = ${e.clientX - rect.left - dragOffset.current.left}`)
+        console.log(`${e.clientY} - ${rect.top} - ${dragOffset.current.top} = ${e.clientY - rect.top - dragOffset.current.top}`)
+        const dropX = e.clientX - dragOffset.current.left;
+        const dropY = e.clientY - dragOffset.current.top;
         updatePosition(id, dropY, dropX);
     };
     useEffect(() => {
@@ -44,8 +46,8 @@ const Slide: React.FC<{
                 ...prevPositions,
                 ...missing.map(m => ({
                     id: m.id,
-                    top: 50,
-                    left: 50,
+                    top: 200,
+                    left: 300,
                 })),
             ];
         });
