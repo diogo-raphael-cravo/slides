@@ -123,7 +123,7 @@ const Geometry: React.FC<{
         width: '100%',
         height: '100%',
         backgroundColor: 'red',
-        display: resizeDirection === ResizeDirection.NONE ? 'block' : 'none'
+        display: resizeDirection === ResizeDirection.NONE ? 'flex' : 'none'
     };
 
     function getGeometry(style: Record<string, string | number>) {
@@ -132,7 +132,22 @@ const Geometry: React.FC<{
         } else if (geo === Geometries.RECTANGLE) {
             return <div style={style}></div>
         } else {
-            return <svg style={style} xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="#5f6368"><path d="m80-160 400-640 400 640H80Zm144-80h512L480-650 224-240Zm256-205Z"/></svg>
+            return <div style={style}>
+                <div style={{
+                    width: '100%',
+                    height: '100%',
+                    background: 'linear-gradient(to bottom right, #fff 50%, transparent 50%), red',
+                    backgroundSize: '100% 100%',
+                    backgroundRepeat: 'no-repeat',
+                }}></div>
+                <div style={{
+                    width: '100%',
+                    height: '100%',
+                    background: 'linear-gradient(to bottom left, #fff 50%, transparent 50%), red',
+                    backgroundSize: '100% 100%',
+                    backgroundRepeat: 'no-repeat',
+                }}></div>
+            </div>
         }
     }
 
@@ -193,7 +208,7 @@ const Geometry: React.FC<{
         opacity: 0.5,
         position: 'absolute',
         backgroundColor: 'red',
-        display: resizeDirection !== ResizeDirection.NONE ? 'block' : 'none'
+        display: resizeDirection !== ResizeDirection.NONE ? 'flex' : 'none'
     };
     return <div ref={parent} onClick={click} style={style} draggable onDragStart={dragStart} onDragEnd={dragEnd}>
         <div onMouseDown={() => startResize(ResizeDirection.TOP_LEFT)} className='resize-diagonal-top-right' style={{
