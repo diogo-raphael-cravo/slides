@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Geometries } from './ActionBar';
 import Geometry from './Geometry';
+import Image from './Image';
 
 const Slide: React.FC<{
-    geometries: { id: string, geo: Geometries }[],
-}> = function ({ geometries }) {
+    geometries: { id: string, geo: Geometries }[]
+    images: { id: string, image: string | ArrayBuffer | null | undefined }[],
+}> = function ({ geometries, images }) {
     const [positions, setPositions] = useState<{ id: string, top: number, left: number }[]>([]);
     const parent = useRef<HTMLDivElement>(null);
     const dragOffset = useRef<{ top: number, left: number }>({ top: 0, left: 0 });
@@ -41,17 +43,23 @@ const Slide: React.FC<{
     };
     useEffect(() => {
         setPositions(prevPositions => {
-            const missing = geometries.filter(({ id }) => !prevPositions.find(prev => prev.id === id));
+            const missingGeometries = geometries.filter(({ id }) => !prevPositions.find(prev => prev.id === id));
+            const missingImages = images.filter(({ id }) => !prevPositions.find(prev => prev.id === id));
             return [
                 ...prevPositions,
-                ...missing.map(m => ({
+                ...missingGeometries.map(m => ({
+                    id: m.id,
+                    top: 200,
+                    left: 300,
+                })),
+                ...missingImages.map(m => ({
                     id: m.id,
                     top: 200,
                     left: 300,
                 })),
             ];
         });
-    }, [geometries]);
+    }, [geometries, images]);
     function getPosition(id: string): { top: number, left: number } {
         return positions.find(pos => pos.id === id) || { top: 50, left: 50 };
     }
@@ -63,12 +71,21 @@ const Slide: React.FC<{
             margin: '50px',
             display: 'flex',
         }} onDragOver={handleDragOver} onDrop={handleDrop}>
-            { geometries.map(({ id, geo }) => <Geometry key={id} id={id} geo={geo} position={getPosition(id)}
+            { geometries.map(({ id, geo }) => <Geometry
+                key={id} id={id} geo={geo} position={getPosition(id)}
                 onChangePosition={({ top, left }) => {
                     const curr = getPosition(id);
                     updatePosition(id, curr.top + top, curr.left + left);
                 }}
                 onDragStart={offset => { dragOffset.current = offset }}/>) }
+            { images.map(({ id, image }) => <Image
+                key={id} id={id} src={image} position={getPosition(id)}
+                onChangePosition={({ top, left }) => {
+                    const curr = getPosition(id);
+                    updatePosition(id, curr.top + top, curr.left + left);
+                }}
+                onDragStart={offset => { dragOffset.current = offset }}
+                />) }
         </div>
     );
 }
