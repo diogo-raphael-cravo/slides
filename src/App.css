@@ -44,3 +44,7 @@
   cursor: nesw-resize;
 }
 
+.non-focusable:focus {
+  border: none;
+  outline: none;
+}

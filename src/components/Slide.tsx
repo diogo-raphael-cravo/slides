@@ -2,12 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Geometries } from './ActionBar';
 import Geometry from './Geometry';
 import Image from './Image';
+import Text, { TextType } from './Text';
 
 const Slide: React.FC<{
     geometries: { id: string, geo: Geometries }[],
     images: { id: string, image: string | ArrayBuffer | null | undefined }[],
+    text: { id: string, text: TextType }[],
     onSlideChanged: () => void,
-}> = function ({ geometries, images, onSlideChanged }) {
+    onTextChanged: (newText: { id: string, text: TextType }) => void,
+}> = function ({ geometries, images, text, onSlideChanged, onTextChanged }) {
     const [positions, setPositions] = useState<{ id: string, top: number, left: number }[]>([]);
     const parent = useRef<HTMLDivElement>(null);
     const dragOffset = useRef<{ top: number, left: number }>({ top: 0, left: 0 });
@@ -47,6 +50,7 @@ const Slide: React.FC<{
         setPositions(prevPositions => {
             const missingGeometries = geometries.filter(({ id }) => !prevPositions.find(prev => prev.id === id));
             const missingImages = images.filter(({ id }) => !prevPositions.find(prev => prev.id === id));
+            const missingText = text.filter(({ id }) => !prevPositions.find(prev => prev.id === id));
             return [
                 ...prevPositions,
                 ...missingGeometries.map(m => ({
@@ -59,9 +63,14 @@ const Slide: React.FC<{
                     top: 200,
                     left: 300,
                 })),
+                ...missingText.map(m => ({
+                    id: m.id,
+                    top: 200,
+                    left: 300,
+                })),
             ];
         });
-    }, [geometries, images]);
+    }, [geometries, images, text]);
     function getPosition(id: string): { top: number, left: number } {
         return positions.find(pos => pos.id === id) || { top: 50, left: 50 };
     }
@@ -87,6 +96,26 @@ const Slide: React.FC<{
                 }}
                 onDragStart={offset => { dragOffset.current = offset }}
                 onImageChanged={onSlideChanged}
+                />) }
+            { text.map(({ id, text }) => <Text
+                key={id} id={id} text={text} position={getPosition(id)}
+                onChangePosition={({ top, left }) => {
+                    const curr = getPosition(id);
+                    updatePosition(id, curr.top + top, curr.left + left);
+                }}
+                onDragStart={offset => { dragOffset.current = offset }}
+                onTextChanged={(newText) => {
+                    if (undefined === newText) {
+                        onSlideChanged();
+                        return;
+                    }
+                    onTextChanged({
+                        id,
+                        text: {
+                            content: newText,
+                        },
+                    });
+                }}
                 />) }
         </div>
     );

@@ -5,10 +5,13 @@ import ActionBar, { Geometries } from './components/ActionBar';
 import SlideList from './components/SlideList';
 import Slide from './components/Slide';
 import html2canvas from 'html2canvas';
+import { TextType } from './components/Text';
+
 
 function App() {
   const [slideGeometries, setSlideGeometries] = useState<{ id: string, geo: Geometries }[]>([]);
   const [slideImages, setSlideImages] = useState<{ id: string, image: string | ArrayBuffer | null | undefined }[]>([]);
+  const [slideText, setSlideText] = useState<{ id: string, text: TextType }[]>([]);
   const [slidePreviews, setSlidePreviews] = useState<{ id: string, src: string | undefined }[]>([{
     id: `${Math.random()}`,
     src: undefined,
@@ -23,6 +26,14 @@ function App() {
     }
   }, [shouldUpdateSlide]);
 
+  function onPlaceText() {
+    setSlideText(texts => [...texts, {
+      id: `${Math.random()}`,
+      text: {
+        content: 'Replace this text...'
+      },
+    }]);
+  }
   function onPlaceGeometry(geo: Geometries) {
     setSlideGeometries(geometries => [...geometries, {
       id: `${Math.random()}`,
@@ -56,11 +67,23 @@ function App() {
 
     }
   }
+  function onTextChanged(newText: { id: string, text: TextType }) {
+    setSlideText(texts => {
+      const otherTexts = texts.filter(t => t.id !== newText.id);
+      return [
+        ...otherTexts,
+        {
+          ...newText,
+        },
+      ]
+    });
+    setShouldUpdateSlide(true);
+  }
   return (
     <div className="app">
       <PresentationName/>
       <div>Menus</div>
-      <ActionBar onPlaceGeometry={onPlaceGeometry} onPickImage={onPickImage}/>
+      <ActionBar onPlaceGeometry={onPlaceGeometry} onPickImage={onPickImage} onPlaceText={onPlaceText} />
       <div style={{
         display: 'flex',
         flexDirection: 'row',
@@ -74,7 +97,7 @@ function App() {
             margin: '50px',
             display: 'flex',
         }} ref={slideRef}>
-          <Slide geometries={slideGeometries} images={slideImages} onSlideChanged={() => setShouldUpdateSlide(true)}/>
+          <Slide geometries={slideGeometries} images={slideImages} text={slideText} onSlideChanged={() => setShouldUpdateSlide(true)} onTextChanged={onTextChanged}/>
         </div>
         </div>
       <div style={{ height: 100 }}></div>

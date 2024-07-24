@@ -14,7 +14,8 @@ export enum Geometries {
 const ActionBar: React.FC<{
     onPlaceGeometry: (geo: Geometries) => void,
     onPickImage: (image: File) => void,
-}> = function ({ onPlaceGeometry, onPickImage }) {
+    onPlaceText: () => void,
+}> = function ({ onPlaceGeometry, onPickImage, onPlaceText }) {
     const [menuOpen, setMenuOpen] = useState<string>(Menus.NONE);
     const clickedMenuFlag = useRef<boolean>();
     const imageRef = useRef<HTMLInputElement>(null);
@@ -65,6 +66,10 @@ const ActionBar: React.FC<{
                 onChange={(e: any) => e.target.files[0] && onPickImage(e.target.files[0])}/>
             <svg onClick={() => imageRef.current?.click()} className='menu-item' xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368">
                 <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm40-80h480L570-480 450-320l-90-120-120 160Zm-40 80v-560 560Z"/>
+            </svg>
+            {/* text */}
+            <svg className='menu-item' onClick={onPlaceText} xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368">
+                <path d="M420-160v-520H200v-120h560v120H540v520H420Z"/>
             </svg>
         </div>
     );
