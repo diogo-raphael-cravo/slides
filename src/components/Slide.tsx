@@ -4,9 +4,10 @@ import Geometry from './Geometry';
 import Image from './Image';
 
 const Slide: React.FC<{
-    geometries: { id: string, geo: Geometries }[]
+    geometries: { id: string, geo: Geometries }[],
     images: { id: string, image: string | ArrayBuffer | null | undefined }[],
-}> = function ({ geometries, images }) {
+    onSlideChanged: () => void,
+}> = function ({ geometries, images, onSlideChanged }) {
     const [positions, setPositions] = useState<{ id: string, top: number, left: number }[]>([]);
     const parent = useRef<HTMLDivElement>(null);
     const dragOffset = useRef<{ top: number, left: number }>({ top: 0, left: 0 });
@@ -40,6 +41,7 @@ const Slide: React.FC<{
         const dropX = e.clientX - dragOffset.current.left;
         const dropY = e.clientY - dragOffset.current.top;
         updatePosition(id, dropY, dropX);
+        onSlideChanged();
     };
     useEffect(() => {
         setPositions(prevPositions => {
@@ -64,11 +66,8 @@ const Slide: React.FC<{
         return positions.find(pos => pos.id === id) || { top: 50, left: 50 };
     }
     return (
-        <div ref={parent}style={{
-            backgroundColor: '#fff',
-            flex: '0 0 1200px',
-            border: '1px solid #d1d1d1',
-            margin: '50px',
+        <div ref={parent} style={{
+            flex: '1',
             display: 'flex',
         }} onDragOver={handleDragOver} onDrop={handleDrop}>
             { geometries.map(({ id, geo }) => <Geometry
@@ -77,7 +76,9 @@ const Slide: React.FC<{
                     const curr = getPosition(id);
                     updatePosition(id, curr.top + top, curr.left + left);
                 }}
-                onDragStart={offset => { dragOffset.current = offset }}/>) }
+                onDragStart={offset => { dragOffset.current = offset }}
+                onGeometryChanged={onSlideChanged}
+                />) }
             { images.map(({ id, image }) => <Image
                 key={id} id={id} src={image} position={getPosition(id)}
                 onChangePosition={({ top, left }) => {
@@ -85,6 +86,7 @@ const Slide: React.FC<{
                     updatePosition(id, curr.top + top, curr.left + left);
                 }}
                 onDragStart={offset => { dragOffset.current = offset }}
+                onImageChanged={onSlideChanged}
                 />) }
         </div>
     );

@@ -19,7 +19,8 @@ const Image: React.FC<{
     position: { top: number, left: number },
     onChangePosition: (offset: { top: number, left: number }) => void,
     onDragStart: (offset: { top: number, left: number }) => void,
-}> = function ({ id, src, position, onChangePosition, onDragStart }) {
+    onImageChanged: () => void,
+}> = function ({ id, src, position, onChangePosition, onDragStart, onImageChanged }) {
     const [dimensions, setDimensions] = useState<{ w: number, h: number }>({ w: 50, h: 50 });
     const [showResizeBox, setShowResizeBox] = useState<boolean>(false);
     const clickedGeometryFlag = useRef<boolean>();
@@ -104,6 +105,7 @@ const Image: React.FC<{
                 setResizeDirection(ResizeDirection.NONE);
                 setDimensions({ ...shadowDimensions });
                 onChangePosition({ ...shadowPosition });
+                onImageChanged();
             }
         }
         document.addEventListener('mouseup', handleMouseUp);
